@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Hub Console — NexaMart</title>
+  
+  <!-- Global & Page CSS files -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- Persistent Header Navigation -->
+  <header></header>
+
+  <!-- Main Admin Section Container -->
+  <main class="container section-padding">
+    <h2 class="admin-title text-gradient" style="font-size:1.8rem; margin-bottom:2.5rem;">NexaMart Console</h2>
+    
+    <div class="admin-layout">
+      
+      <!-- Side Menu Tabs Selector -->
+      <aside class="admin-sidebar glass" style="height:fit-content;">
+        <span class="admin-menu-btn active" onclick="switchAdminTab('metrics')">📊 Analytics Overview</span>
+        <span class="admin-menu-btn" onclick="switchAdminTab('products')">📦 Products Stock CRUD</span>
+        <span class="admin-menu-btn" onclick="switchAdminTab('orders')">📥 Incoming Orders</span>
+      </aside>
+      
+      <!-- Content Box panels -->
+      <div class="admin-content">
+        
+        <!-- Panel 1: Metrics Analytics -->
+        <div class="admin-panel" id="panel-metrics">
+          
+          <!-- Key metrics calculated dynamically in admin.js -->
+          <div class="admin-metrics-grid">
+            <div class="metric-card glass">
+              <span class="metric-label">Sales Revenue</span>
+              <span id="admin-revenue" class="metric-value">$0.00</span>
+              <span class="metric-trend up">&uarr; 15% this week</span>
+            </div>
+            <div class="metric-card glass">
+              <span class="metric-label">Completed Orders</span>
+              <span id="admin-orders-count" class="metric-value">0</span>
+              <span class="metric-trend up">&uarr; 8% this week</span>
+            </div>
+            <div class="metric-card glass">
+              <span class="metric-label">Total Products</span>
+              <span id="admin-products-count" class="metric-value">0</span>
+              <span class="metric-trend" style="color:var(--text-secondary);">Active listings</span>
+            </div>
+            <div class="metric-card glass">
+              <span class="metric-label">Inventory Assets Val.</span>
+              <span id="admin-stock-value" class="metric-value">$0.00</span>
+              <span class="metric-trend down">&darr; 2% stock values</span>
+            </div>
+          </div>
+          
+          <!-- Sales distribution chart by Category -->
+          <div class="glass chart-box">
+            <h4>Sales Revenue By Category</h4>
+            <div class="css-chart" id="sales-css-chart">
+              <!-- Rendered dynamically in admin.js -->
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Panel 2: Products CRUD Management Table -->
+        <div class="admin-panel" id="panel-products" style="display:none;">
+          <div class="flex justify-between align-center" style="margin-bottom:1.5rem;">
+            <h3>Inventory Catalog</h3>
+            <button onclick="openAddModal()" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size:0.85rem;">+ Create Product</button>
+          </div>
+          
+          <div class="admin-table-container glass">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-tbody">
+                <!-- Rows injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Panel 3: Orders List Records Table -->
+        <div class="admin-panel" id="panel-orders" style="display:none;">
+          <h3 style="margin-bottom:1.5rem;">Client Purchase Orders</h3>
+          
+          <div class="admin-table-container glass">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order Reference</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Products Purchased</th>
+                  <th>Total Paid</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="admin-orders-tbody">
+                <!-- Rows injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </main>
+
+  <!-- Create/Edit CRUD Modal overlay -->
+  <div class="modal-backdrop" id="admin-product-modal">
+    <div class="modal glass">
+      <div class="flex justify-between align-center" style="margin-bottom:1.5rem; border-bottom:1px solid var(--glass-border); padding-bottom:0.5rem;">
+        <h3 style="margin:0;">Create / Edit Product Listing</h3>
+        <button onclick="closeModal()" style="font-size:1.5rem; cursor:pointer; color:var(--text-secondary);">&times;</button>
+      </div>
+      
+      <form id="admin-product-form" onsubmit="saveProductForm(event)">
+        <input type="hidden" id="prod-form-id">
+        
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" id="prod-form-name" class="form-control" required placeholder="AeroSound Pro ANC">
+        </div>
+        
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Brand Name *</label>
+            <input type="text" id="prod-form-brand" class="form-control" required placeholder="AeroSound">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select id="prod-form-category" class="form-control" style="background:rgba(255,255,255,0.03); color:inherit; border:1px solid var(--glass-border);">
+              <option value="Electronics">Electronics</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home & Living">Home & Living</option>
+              <option value="Sports & Outdoors">Sports & Outdoors</option>
+              <option value="Books & Media">Books & Media</option>
+              <option value="Beauty & Health">Beauty & Health</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid" style="grid-template-columns:1fr 1fr; gap:1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Price ($) *</label>
+            <input type="number" step="0.01" id="prod-form-price" class="form-control" required placeholder="199.99" min="0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stock Quantity *</label>
+            <input type="number" id="prod-form-stock" class="form-control" required placeholder="25" min="0">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Image Unsplash URL</label>
+          <input type="url" id="prod-form-image" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+        </div>
+        
+        <div class="form-group" style="margin-bottom:1.5rem;">
+          <label class="form-label">Description</label>
+          <textarea id="prod-form-desc" class="form-control" rows="3" placeholder="Enter product details..."></textarea>
+        </div>
+        
+        <div class="flex gap-2">
+          <button type="button" onclick="closeModal()" class="btn btn-secondary" style="flex:1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Slide-out Shopping Cart Drawer Backdrop and Drawer -->
+  <div class="drawer-backdrop"></div>
+  <div class="drawer" style="display:none;"></div>
+
+  <!-- Persistent Footer -->
+  <footer></footer>
+
+  <!-- Master JavaScript APIs loading -->
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

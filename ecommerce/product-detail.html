@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details — NexaMart</title>
+  
+  <!-- Global & Page CSS files -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- Persistent Header Navigation -->
+  <header></header>
+
+  <!-- Main Product Detail Container -->
+  <main class="container section-padding">
+    <div class="product-detail-layout">
+      
+      <!-- Gallery Column -->
+      <div class="detail-gallery scroll-reveal active">
+        <div class="detail-main-img-box glass">
+          <!-- Main Image injected dynamically -->
+        </div>
+        <div class="detail-thumbnails">
+          <!-- Image thumbnails injected dynamically -->
+        </div>
+      </div>
+      
+      <!-- Information Column -->
+      <div class="detail-info scroll-reveal active">
+        <div class="detail-meta">
+          <span id="detail-stock-badge" class="badge">In Stock</span>
+        </div>
+        
+        <h1 class="detail-title text-gradient" style="font-size:2.2rem; margin-bottom:0.75rem;">Product Name</h1>
+        
+        <div class="detail-rating-row">
+          <!-- Stars rating scores -->
+        </div>
+        
+        <div class="detail-price-row">
+          <span id="detail-product-price" class="detail-price">$0.00</span>
+          <span id="detail-product-old-price" class="detail-old-price">$0.00</span>
+        </div>
+        
+        <p class="detail-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id convallis lectus. In molestie tincidunt ex sit amet scelerisque. Curabitur vel lorem diam.</p>
+        
+        <!-- Options List (Size, Colors) -->
+        <div class="detail-options">
+          <!-- Populated in product-detail.js -->
+        </div>
+        
+        <!-- Actions & Quantity -->
+        <div class="detail-actions">
+          <div class="quantity-selector">
+            <button class="qty-btn" onclick="adjustQuantity(-1)">&minus;</button>
+            <input type="text" id="detail-qty" class="qty-input" value="1" readonly>
+            <button class="qty-btn" onclick="adjustQuantity(1)">+</button>
+          </div>
+          
+          <button onclick="addCurrentToCart()" class="btn btn-primary" style="flex:1;">Add To Cart</button>
+          
+          <button id="detail-wishlist-btn" onclick="toggleCurrentWishlist()" class="btn btn-secondary btn-icon" title="Save to Wishlist">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Specs and Details tab systems -->
+    <section class="scroll-reveal" style="margin-top: 4rem;">
+      <div class="detail-tabs">
+        <span class="tab-btn active" onclick="switchTab(this, 'tab-desc-content')">Description</span>
+        <span class="tab-btn" onclick="switchTab(this, 'tab-specs-content')">Specifications</span>
+        <span class="tab-btn" onclick="switchTab(this, 'tab-reviews-content')">Reviews</span>
+      </div>
+      
+      <div class="tab-content active" id="tab-desc-content"></div>
+      <div class="tab-content" id="tab-specs-content"></div>
+      
+      <!-- Customer Reviews Tab Content -->
+      <div class="tab-content" id="tab-reviews-content">
+        <div class="grid" style="grid-template-columns:1.2fr 0.8fr; gap:4rem;">
+          
+          <!-- Existing reviews list -->
+          <div>
+            <h4 style="margin-bottom:1.5rem;">Customer Reviews</h4>
+            <div id="reviews-list-container">
+              <!-- Rendered in dynamic DOM reviews.js -->
+            </div>
+          </div>
+          
+          <!-- Submit new review form box -->
+          <div class="glass add-review-box" style="height:fit-content;">
+            <h4 style="margin-bottom:1rem; color:var(--secondary);">Add A Review</h4>
+            <form onsubmit="submitReview(event)">
+              
+              <div class="form-group" id="anonymous-name-group">
+                <label class="form-label">Your Name</label>
+                <input type="text" id="review-author" class="form-control" placeholder="Jane Doe">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Rating</label>
+                <select id="review-rating-select" class="form-control" style="background:rgba(255,255,255,0.03); color:inherit; border:1px solid var(--glass-border);">
+                  <option value="5">⭐⭐⭐⭐⭐ 5 Stars</option>
+                  <option value="4">⭐⭐⭐⭐ 4 Stars</option>
+                  <option value="3">⭐⭐⭐ 3 Stars</option>
+                  <option value="2">⭐⭐ 2 Stars</option>
+                  <option value="1">⭐ 1 Star</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Review Comment</label>
+                <textarea id="review-comment" class="form-control" rows="4" placeholder="Share your experience with this product..." required></textarea>
+              </div>
+              
+              <button type="submit" class="btn btn-primary" style="width:100%;">Submit Review</button>
+            </form>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+
+    <!-- You Might Also Like section -->
+    <section class="section-padding scroll-reveal">
+      <h3 style="margin-bottom:2.5rem;">You Might Also Like</h3>
+      <div class="grid" id="recommendations-grid" style="grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:2rem;">
+        <!-- Recommendations injected dynamically -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Slide-out Shopping Cart Drawer Backdrop and Drawer -->
+  <div class="drawer-backdrop"></div>
+  <div class="drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title">🛒 Your Cart</h3>
+      <button class="drawer-close-btn" onclick="window.NexaCart.closeCartDrawer()">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <!-- Items dynamically populated -->
+    </div>
+    <div class="drawer-footer">
+      <div class="drawer-summary-row">
+        <span>Subtotal</span>
+        <span id="drawer-subtotal">$0.00</span>
+      </div>
+      <div class="drawer-summary-row" id="drawer-discount-row" style="color:var(--danger); display:none;">
+        <span>Discount Coupon</span>
+        <span id="drawer-discount">-$0.00</span>
+      </div>
+      <div class="drawer-summary-row">
+        <span>Est. Shipping</span>
+        <span id="drawer-shipping">FREE</span>
+      </div>
+      <div class="drawer-summary-row">
+        <span>Est. Taxes (8%)</span>
+        <span id="drawer-tax">$0.00</span>
+      </div>
+      <div class="drawer-summary-row total">
+        <span>Order Total</span>
+        <span id="drawer-total">$0.00</span>
+      </div>
+      <a href="checkout.html" class="btn btn-primary" style="width:100%;">Proceed To Checkout &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Persistent Footer -->
+  <footer></footer>
+
+  <!-- Master JavaScript APIs loading -->
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/product-detail.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Hide name entry block if client is authenticated session logged in
+      const user = NexaAuth.getCurrentUser();
+      const nameBlock = document.getElementById('anonymous-name-group');
+      if (user && nameBlock) {
+        nameBlock.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
