@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Shopping Cart — NexaMart</title>
+  
+  <!-- Global & Page CSS files -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+  <!-- Persistent Header Navigation -->
+  <header></header>
+
+  <!-- Main Cart Section -->
+  <main class="container section-padding">
+    <h1 class="text-gradient" style="font-size:2.2rem; margin-bottom:2.5rem;">Shopping Cart</h1>
+    
+    <div class="cart-layout">
+      
+      <!-- Cart Items List Container -->
+      <div class="cart-table-card glass" id="full-cart-items-box">
+        <!-- Rendered in javascript -->
+      </div>
+      
+      <!-- Summary panel -->
+      <div class="glass" style="padding:2rem; height:fit-content;">
+        <h3 style="margin-bottom:1.5rem; border-bottom:1px solid var(--glass-border); padding-bottom:0.5rem;">Order Summary</h3>
+        
+        <div class="drawer-summary-row" style="margin-bottom:1rem;">
+          <span>Subtotal</span>
+          <span id="cart-subtotal">$0.00</span>
+        </div>
+        
+        <div class="drawer-summary-row" id="cart-discount-row" style="color:var(--danger); display:none; margin-bottom:1rem;">
+          <span>Coupon Discount</span>
+          <span id="cart-discount">-$0.00</span>
+        </div>
+        
+        <div class="drawer-summary-row" style="margin-bottom:1rem;">
+          <span>Est. Shipping</span>
+          <span id="cart-shipping">FREE</span>
+        </div>
+        
+        <div class="drawer-summary-row" style="margin-bottom:1rem;">
+          <span>Sales Taxes (8%)</span>
+          <span id="cart-tax">$0.00</span>
+        </div>
+        
+        <div class="drawer-summary-row total" style="margin-bottom:2rem; font-size:1.25rem;">
+          <span>Estimated Total</span>
+          <span id="cart-total">$0.00</span>
+        </div>
+        
+        <!-- Promo Coupon Forms -->
+        <form id="cart-promo-form" onsubmit="applyPromo(event)" style="display:flex; gap:0.5rem; margin-bottom:2rem;">
+          <input type="text" id="promo-input" class="form-control" placeholder="WELCOME10" style="padding:0.6rem 0.75rem;">
+          <button type="submit" class="btn btn-secondary" style="padding: 0.6rem 1rem;">Apply</button>
+        </form>
+        
+        <a href="checkout.html" class="btn btn-primary" style="width:100%;">Proceed to Checkout &rarr;</a>
+      </div>
+      
+    </div>
+  </main>
+
+  <!-- Slide-out Shopping Cart Drawer Backdrop and Drawer (required by app.js logic but hidden or secondary here) -->
+  <div class="drawer-backdrop"></div>
+  <div class="drawer" style="display:none;"></div>
+
+  <!-- Persistent Footer -->
+  <footer></footer>
+
+  <!-- Master JavaScript APIs loading -->
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/wishlist.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/app.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderFullCartPage();
+    });
+    
+    function renderFullCartPage() {
+      const box = document.getElementById('full-cart-items-box');
+      if (!box) return;
+      
+      const cart = NexaCart.getCart();
+      const totals = NexaCart.getCartTotals();
+      
+      if (cart.length === 0) {
+        box.innerHTML = `
+          <div class="flex flex-col align-center justify-center text-center gap-2" style="padding:4rem 0;">
+            <svg width="64" height="64" fill="var(--text-secondary)" viewBox="0 0 24 24">
+              <path d="M17.21 9l-4.38-6.56c-.18-.27-.51-.44-.83-.44-.32 0-.65.17-.83.44L6.79 9H2c-.55 0-1 .45-1 1v10c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V10c0-.55-.45-1-1-1h-4.79zM9 9l3-4.5L15 9H9zm11 11H4v-8h16v8zm-8-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+            </svg>
+            <h3>Your Cart is Empty</h3>
+            <p>Ready to find something incredible? Explore our store catalogs.</p>
+            <a href="products.html" class="btn btn-primary" style="margin-top:1.5rem;">Explore Products</a>
+          </div>
+        `;
+        updatePageSummary(totals);
+        return;
+      }
+      
+      let cartHtml = '';
+      cart.forEach(item => {
+        const optId = JSON.stringify(item.options);
+        const optionsText = Object.entries(item.options)
+          .map(([k, v]) => `<span class="badge" style="background:rgba(255,255,255,0.05); color:var(--text-secondary); margin-right:4px;">${k}: ${v}</span>`)
+          .join('');
+          
+        cartHtml += `
+          <div class="cart-item-row">
+            <div class="cart-item-img">
+              <img src="${item.image}" alt="${item.name}">
+            </div>
+            <div class="cart-item-details">
+              <a href="product-detail.html?id=${item.id}" class="cart-item-title">${item.name}</a>
+              <div style="margin-top:0.4rem;">${optionsText}</div>
+            </div>
+            <div class="quantity-selector">
+              <button class="qty-btn" onclick="updatePageQty('${item.id}', '${optId.replace(/'/g, "\\'")}', ${item.quantity - 1})">&minus;</button>
+              <span class="qty-input">${item.quantity}</span>
+              <button class="qty-btn" onclick="updatePageQty('${item.id}', '${optId.replace(/'/g, "\\'")}', ${item.quantity + 1})">+</button>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+              <span style="font-weight:700; color:var(--secondary); font-size:1.1rem;">${NexaUtils.formatCurrency(item.price * item.quantity)}</span>
+              <button onclick="removePageItem('${item.id}', '${optId.replace(/'/g, "\\'")}')" class="btn-danger" style="padding:0.25rem 0.5rem; font-size:0.8rem; border-radius:4px; cursor:pointer;">Remove</button>
+            </div>
+          </div>
+        `;
+      });
+      box.innerHTML = cartHtml;
+      updatePageSummary(totals);
+    }
+    
+    function updatePageQty(productId, optionIdString, newQty) {
+      NexaCart.updateQuantity(productId, optionIdString, newQty);
+      renderFullCartPage();
+    }
+    
+    function removePageItem(productId, optionIdString) {
+      NexaCart.removeItem(productId, optionIdString);
+      renderFullCartPage();
+    }
+    
+    function updatePageSummary(totals) {
+      const subtotalLabel = document.getElementById('cart-subtotal');
+      const discountRow = document.getElementById('cart-discount-row');
+      const discountLabel = document.getElementById('cart-discount');
+      const shippingLabel = document.getElementById('cart-shipping');
+      const taxLabel = document.getElementById('cart-tax');
+      const totalLabel = document.getElementById('cart-total');
+      
+      if (subtotalLabel) subtotalLabel.textContent = NexaUtils.formatCurrency(totals.subtotal);
+      
+      if (totals.discountVal > 0) {
+        if (discountRow) discountRow.style.display = 'flex';
+        if (discountLabel) discountLabel.textContent = `-${NexaUtils.formatCurrency(totals.discountVal)}`;
+      } else {
+        if (discountRow) discountRow.style.display = 'none';
+      }
+      
+      if (shippingLabel) {
+        shippingLabel.textContent = totals.shipping === 0 ? "FREE" : NexaUtils.formatCurrency(totals.shipping);
+      }
+      if (taxLabel) taxLabel.textContent = NexaUtils.formatCurrency(totals.tax);
+      if (totalLabel) totalLabel.textContent = NexaUtils.formatCurrency(totals.total);
+    }
+    
+    function applyPromo(event) {
+      event.preventDefault();
+      const code = document.getElementById('promo-input').value;
+      const res = NexaCart.applyPromoCode(code);
+      
+      if (res.success) {
+        NexaUtils.showToast(res.message, "success");
+        renderFullCartPage();
+      } else {
+        NexaUtils.showToast(res.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>
